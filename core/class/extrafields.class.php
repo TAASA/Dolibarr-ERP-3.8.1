@@ -616,6 +616,26 @@ class ExtraFields
 					$this->attribute_alwayseditable[$tab->name]=$tab->alwayseditable;
 					$this->attribute_perms[$tab->name]=$tab->perms;
 					$this->attribute_list[$tab->name]=$tab->list;
+
+					// Checkpoint: 
+
+					if (isset($this->attribute_label['slc']))
+					{
+						$this->attribute_param['slc']['options'] = array();
+					}
+					$sql2 = "SELECT llx_user.rowid, llx_user.firstname";
+					$sql2.= " FROM llx_user";
+					$sql2.= " JOIN llx_usergroup";
+					$sql2.= " JOIN llx_usergroup_user";
+					$sql2.= " WHERE llx_usergroup_user.fk_user = llx_user.rowid";
+					$sql2.= " AND llx_usergroup_user.fk_usergroup = llx_usergroup.rowid";
+					$sql2.= " AND llx_usergroup.nom = 'Vendedores'";
+
+					$resql1=$this->db->query($sql2);
+				
+					while($row = $resql1->fetch_assoc()){
+							$this->attribute_param['slc']['options'][$row['rowid']] = $row['firstname'];							
+						}
 				}
 			}
 		}
