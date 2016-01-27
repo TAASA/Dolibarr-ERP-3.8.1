@@ -5,17 +5,17 @@
 // Take a look at conf.php.example file for an example of conf.php file
 // and explanations for all possibles parameters.
 //
-$dolibarr_main_url_root='http://localhost/taasaDoli/htdocs';
-$dolibarr_main_document_root='C:/xampp/htdocs/taasaDoli/htdocs';
-//$dolibarr_main_url_root_alt='/custom';
-//$dolibarr_main_document_root_alt='C:/xampp/htdocs/taasaDoli/htdocs/custom';
-$dolibarr_main_data_root='C:/xampp/htdocs/taasaDoli/documents';
-$dolibarr_main_db_host='localhost';
+$dolibarr_main_url_root='http://localhost/taasa/htdocs';
+$dolibarr_main_document_root='C:/xampp/htdocs/taasa/htdocs';
+$dolibarr_main_url_root_alt='/custom';
+$dolibarr_main_document_root_alt='C:/xampp/htdocs/taasa/htdocs/custom';
+$dolibarr_main_data_root='C:/xampp/htdocs/taasa/documents';
+$dolibarr_main_db_host='lionsystem.net';
 $dolibarr_main_db_port='';
-$dolibarr_main_db_name='taasa_db';
+$dolibarr_main_db_name='lionsys_tpruebas';
 $dolibarr_main_db_prefix='llx_';
-$dolibarr_main_db_user='root';
-$dolibarr_main_db_pass='';
+$dolibarr_main_db_user='lions_tpruebas';
+$dolibarr_main_db_pass='Tpruebas123';
 $dolibarr_main_db_type='mysqli';
 $dolibarr_main_db_character_set='utf8';
 $dolibarr_main_db_collation='utf8_general_ci';
