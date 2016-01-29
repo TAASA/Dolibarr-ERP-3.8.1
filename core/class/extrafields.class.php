@@ -619,9 +619,9 @@ class ExtraFields
 
 					// Checkpoint: 
 
-					if (isset($this->attribute_label['slc']))
+					if (isset($this->attribute_label['vendedor']))
 					{
-						$this->attribute_param['slc']['options'] = array();
+						$this->attribute_param['vendedor']['options'] = array();
 					}
 					$sql2 = "SELECT llx_user.rowid, llx_user.firstname";
 					$sql2.= " FROM llx_user";
@@ -634,7 +634,7 @@ class ExtraFields
 					$resql1=$this->db->query($sql2);
 				
 					while($row = $resql1->fetch_assoc()){
-							$this->attribute_param['slc']['options'][$row['rowid']] = $row['firstname'];							
+							$this->attribute_param['vendedor']['options'][$row['rowid']] = $row['firstname'];							
 						}
 				}
 			}
