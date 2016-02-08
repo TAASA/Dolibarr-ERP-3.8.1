@@ -617,7 +617,7 @@ class ExtraFields
 					$this->attribute_perms[$tab->name]=$tab->perms;
 					$this->attribute_list[$tab->name]=$tab->list;
 
-					// Checkpoint: 
+					// Checkpoint, Agregado vendedor a nuevo tercero: 
 
 					if (isset($this->attribute_label['vendedor']))
 					{

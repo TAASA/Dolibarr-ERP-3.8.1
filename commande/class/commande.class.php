@@ -72,6 +72,10 @@ class Commande extends CommonOrder
     var $contactid;
     var $fk_project;
 
+
+    //Checkpoint: Variable para tomar el id del vendedor para el pedido
+    var $vendor;
+
 	/**
 	 * Status of the order. Check the following constants:
 	 * @var int
@@ -734,13 +738,25 @@ class Commande extends CommonOrder
 
         $this->db->begin();
 
+        //Checkpoint, Agregar Vendedor al pedido
+
+        $sqlVendor = "SELECT vendedor ";
+                    $sqlVendor.= " FROM llx_societe_extrafields";
+                    $sqlVendor.= " WHERE llx_societe_extrafields.fk_object = ". $this->socid;
+
+                    $resql1=$this->db->query($sqlVendor);
+
+                    $vendedor = $resql1->fetch_assoc();
+                    echo($vendedor);
+
+
         $sql = "INSERT INTO ".MAIN_DB_PREFIX."commande (";
         $sql.= " ref, fk_soc, date_creation, fk_user_author, fk_projet, date_commande, source, note_private, note_public, ref_ext, ref_client, ref_int";
         $sql.= ", model_pdf, fk_cond_reglement, fk_mode_reglement, fk_account, fk_availability, fk_input_reason, date_livraison, fk_delivery_address";
         $sql.= ", fk_shipping_method";
         $sql.= ", remise_absolue, remise_percent";
         $sql.= ", fk_incoterms, location_incoterms";
-        $sql.= ", entity";
+        $sql.= ", entity, fk_vendor";
         $sql.= ")";
         $sql.= " VALUES ('(PROV)',".$this->socid.", '".$this->db->idate($now)."', ".$user->id;
         $sql.= ", ".($this->fk_project>0?$this->fk_project:"null");
@@ -765,6 +781,7 @@ class Commande extends CommonOrder
         $sql.= ", ".(int) $this->fk_incoterms;
         $sql.= ", '".$this->db->escape($this->location_incoterms)."'";
         $sql.= ", ".$conf->entity;
+        $sql.= ", ".$vendedor["vendedor"];
         $sql.= ")";
 
         dol_syslog(get_class($this)."::create", LOG_DEBUG);
