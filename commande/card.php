@@ -21,6 +21,9 @@ if (! empty($conf->projet->enabled)) {
 }
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 
+// Checkpoint: IMPLEM#001 including vendor
+require_once DOL_DOCUMENT_ROOT . '/custom/vendors/class/vendors.class.php';
+
 /////////////////////////////////////////////////////////
 
 $langs->load('orders');
@@ -69,8 +72,6 @@ $hookmanager->initHooks(array('ordercard','globalcard'));
 $permissionnote = $user->rights->commande->creer; 		// Used by the include of actions_setnotes.inc.php
 $permissiondellink = $user->rights->commande->creer; 	// Used by the include of actions_dellink.inc.php
 $permissionedit = $user->rights->commande->creer; 		// Used by the include of actions_lineupdown.inc.php
-
-
 
 /*
  * Actions
@@ -1571,6 +1572,11 @@ if ($action == 'create' && $user->rights->commande->creer)
 		$author = new User($db);
 		$author->fetch($object->user_author_id);
 
+		// Checkpoint: IMPLEM#001 fetch vendor
+		$vendor = new Vendors($db);
+		$vendor->fetch($object->vendorid);
+		///// 
+
 		$res = $object->fetch_optionals($object->id, $extralabels);
 
 		$head = commande_prepare_head($object);
@@ -1797,6 +1803,12 @@ if ($action == 'create' && $user->rights->commande->creer)
 			$filterabsolutediscount = "fk_facture_source IS NULL OR (fk_facture_source IS NOT NULL AND description='(DEPOSIT)')";
 			$filtercreditnote = "fk_facture_source IS NOT NULL AND description <> '(DEPOSIT)'";
 		}
+
+		// Checkpoint: IMPLEM#001 print vendor
+		// Vendor
+		print '<tr><td>' . $langs->trans('Vendedor') . '</td>';
+		print '<td colspan="3">' . $vendor->getFullName() . '</td>';
+		print '</tr>';
 
 		// Relative and absolute discounts
 		$addrelativediscount = '<a href="' . DOL_URL_ROOT . '/comm/remise.php?id=' . $soc->id . '&backtopage=' . urlencode($_SERVER["PHP_SELF"]) . '?facid=' . $object->id . '">' . $langs->trans("EditRelativeDiscounts") . '</a>';

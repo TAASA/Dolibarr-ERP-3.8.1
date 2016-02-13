@@ -36,7 +36,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
  *
  * Put here description of your class
  */
-class Employees extends CommonObject
+class Vendors extends CommonObject
 {
 	/**
 	 * @var string Error code (or message)
@@ -52,20 +52,14 @@ class Employees extends CommonObject
 	 * @var string Id to identify managed objects
 	 */
 	public $element = 'skeleton';
-	/**
-	 * @var string Name of table without prefix where object is stored
-	 */
-	public $table_element = 'skeleton';
+	
 
 	/**
 	 * @var Skeleton_ClassLine[] Lines
 	 */
 	public $lines = array();
 
-	/**
-	 * @var int ID
-	 */
-	public $id;
+	
 	/**
 	 * @var mixed Sample property 1
 	 */
@@ -75,6 +69,28 @@ class Employees extends CommonObject
 	 */
 	public $prop2;
 	//...
+
+	/* *************************************************************************** */
+	/*                                                                             */
+	/* 								Variables Section                              */
+	/*                                                                             */
+	/* *************************************************************************** */
+
+	/**
+	 * @var int ID
+	 */
+	public $id;
+	
+	public $login;
+	public $firstname;
+	public $lastname;
+
+	/**
+	 * @var string Name of table without prefix where object is stored
+	 */
+	public $table_element = 'user';
+
+	/////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Constructor
@@ -172,15 +188,16 @@ class Employees extends CommonObject
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$sql = 'SELECT';
-		$sql .= ' t.rowid,';
-		$sql .= ' t.field1,';
-		$sql .= ' t.field2';
+		$sql .= ' u.rowid,';
+		$sql .= ' u.login,';
+		$sql .= ' u.firstname,';
+		$sql .= ' u.lastname';
 		//...
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as u';
 		if (null !== $ref) {
-			$sql .= ' WHERE t.ref = ' . '\'' . $ref . '\'';
+			$sql .= ' WHERE u.ref = ' . '\'' . $ref . '\'';
 		} else {
-			$sql .= ' WHERE t.rowid = ' . $id;
+			$sql .= ' WHERE u.rowid = ' . $id;
 		}
 
 		$resql = $this->db->query($sql);
@@ -190,8 +207,9 @@ class Employees extends CommonObject
 				$obj = $this->db->fetch_object($resql);
 
 				$this->id = $obj->rowid;
-				$this->prop1 = $obj->field1;
-				$this->prop2 = $obj->field2;
+				$this->login = $obj->login;
+				$this->firstname = $obj->firstname;
+				$this->lastname = $obj->lastname;
 				//...
 			}
 			$this->db->free($resql);
@@ -451,6 +469,24 @@ class Employees extends CommonObject
 		$this->prop1 = 'prop1';
 		$this->prop2 = 'prop2';
 	}
+
+	/* *************************************************************************** */
+	/*                                                                             */
+	/* 								Custom Functions                               */
+	/*                                                                             */
+	/* *************************************************************************** */
+
+	/**
+	 * Gets the vendor's full name
+	 * 
+	 * @return string Full name
+	 */
+	public function getFullName()
+	{
+		$full_name = $this->firstname . ' ' . $this->lastname;
+		return $full_name;
+	}
+
 
 }
 
