@@ -1,39 +1,14 @@
 <?php
-/* Copyright (C) 2002-2006 Rodolphe Quiedeville  <rodolphe@quiedeville.org>
- * Copyright (C) 2004      Eric Seigne           <eric.seigne@ryxeo.com>
- * Copyright (C) 2004-2014 Laurent Destailleur   <eldy@users.sourceforge.net>
- * Copyright (C) 2005      Marc Barilley / Ocebo <marc@ocebo.com>
- * Copyright (C) 2005-2015 Regis Houssin         <regis.houssin@capnetworks.com>
- * Copyright (C) 2006      Andre Cianfarani      <acianfa@free.fr>
- * Copyright (C) 2010-2015 Juanjo Menent         <jmenent@2byte.es>
- * Copyright (C) 2012-2013 Christophe Battarel   <christophe.battarel@altairis.fr>
- * Copyright (C) 2012-2013 Cédric Salvador       <csalvador@gpcsolutions.fr>
- * Copyright (C) 2012-2014 Raphaël Doursenaud    <rdoursenaud@gpcsolutions.fr>
- * Copyright (C) 2013      Jean-Francois FERRY   <jfefe@aternatik.fr>
- * Copyright (C) 2013-2014 Florian Henry         <florian.henry@open-concept.pro>
- * Copyright (C) 2013      Cédric Salvador       <csalvador@gpcsolutions.fr>
- * Copyright (C) 2014	   Ferran Marcet	 	 <fmarcet@2byte.es>
- * Copyright (C) 2015      Marcos García         <marcosgdf@gmail.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 
 /**
  * \file 	htdocs/compta/facture.php
  * \ingroup facture
  * \brief 	Page to create/see an invoice
  */
+
+//////////////////////////////////////////////////////////
+//					Includes Section 					//
+//////////////////////////////////////////////////////////
 
 require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
@@ -53,6 +28,11 @@ if (! empty($conf->projet->enabled)) {
 	require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 }
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+
+// Checkpoint: IMPLEM#002 including vendor
+require_once DOL_DOCUMENT_ROOT . '/custom/vendors/class/vendors.class.php';
+
+/////////////////////////////////////////////////////////
 
 $langs->load('bills');
 $langs->load('companies');
@@ -2491,6 +2471,11 @@ else if ($id > 0 || ! empty($ref))
 	if ($result < 0) dol_print_error($db);
 	$selleruserevenustamp = $mysoc->useRevenueStamp();
 
+	// Checkpoint: IMPLEM#002 fetch vendor
+	$vendor = new Vendors($db);
+	$vendor->fetch($object->vendorid);
+	///// 
+
 	$totalpaye = $object->getSommePaiement();
 	$totalcreditnotes = $object->getSumCreditNotesUsed();
 	$totaldeposits = $object->getSumDepositsUsed();
@@ -2831,6 +2816,12 @@ else if ($id > 0 || ! empty($ref))
 		}
 		print ')';
 	}
+	print '</tr>';
+
+	// Checkpoint: IMPLEM#002 print vendor
+	// Vendor
+	print '<tr><td>' . $langs->trans('Vendedor') . '</td>';
+	print '<td colspan="3">' . $vendor->getFullName() . '</td>';
 	print '</tr>';
 
 	// Type

@@ -1,45 +1,19 @@
 <?php
-/* Copyright (C) 2002-2007 Rodolphe Quiedeville  <rodolphe@quiedeville.org>
- * Copyright (C) 2004-2013 Laurent Destailleur   <eldy@users.sourceforge.net>
- * Copyright (C) 2004      Sebastien Di Cintio   <sdicintio@ressource-toi.org>
- * Copyright (C) 2004      Benoit Mortier        <benoit.mortier@opensides.be>
- * Copyright (C) 2005      Marc Barilley / Ocebo <marc@ocebo.com>
- * Copyright (C) 2005-2014 Regis Houssin         <regis.houssin@capnetworks.com>
- * Copyright (C) 2006      Andre Cianfarani      <acianfa@free.fr>
- * Copyright (C) 2007      Franky Van Liedekerke <franky.van.liedekerke@telenet.be>
- * Copyright (C) 2010-2014 Juanjo Menent         <jmenent@2byte.es>
- * Copyright (C) 2012-2014 Christophe Battarel   <christophe.battarel@altairis.fr>
- * Copyright (C) 2012-2015 Marcos García         <marcosgdf@gmail.com>
- * Copyright (C) 2012      Cédric Salvador       <csalvador@gpcsolutions.fr>
- * Copyright (C) 2012-2014 Raphaël Doursenaud    <rdoursenaud@gpcsolutions.fr>
- * Copyright (C) 2013      Cedric Gross          <c.gross@kreiz-it.fr>
- * Copyright (C) 2013      Florian Henry		  	<florian.henry@open-concept.pro>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 
-/**
- *	\file       htdocs/compta/facture/class/facture.class.php
- *	\ingroup    facture
- *	\brief      File of class to manage invoices
- */
+//////////////////////////////////////////////////////////
+//					Includes Section 					//
+//////////////////////////////////////////////////////////
 
 include_once DOL_DOCUMENT_ROOT.'/core/class/commoninvoice.class.php';
 require_once DOL_DOCUMENT_ROOT ."/core/class/commonobjectline.class.php";
 require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/client.class.php';
 require_once DOL_DOCUMENT_ROOT.'/margin/lib/margins.lib.php';
+
+// Checkpoint: IMPLEM#002 including vendor
+require_once DOL_DOCUMENT_ROOT . '/custom/vendors/class/vendors.class.php';
+
+/////////////////////////////////////////////////////////
 
 
 /**
@@ -143,6 +117,9 @@ class Facture extends CommonInvoice
 	var $fk_incoterms;
 	var $location_incoterms;
 	var $libelle_incoterms;  //Used into tooltip
+
+	// Checkpoint: IMPLEM#002 icluding vendor
+    var $vendorid;
 
 	/**
 	 * @var int Situation cycle reference number
@@ -327,6 +304,10 @@ class Facture extends CommonInvoice
 		$sql.= ", fk_cond_reglement, fk_mode_reglement, date_lim_reglement, model_pdf";
 		$sql.= ", situation_cycle_ref, situation_counter, situation_final";
 		$sql.= ", fk_incoterms, location_incoterms";
+
+		// Checkpoint: IMPLEM#002 adding vendor in sql
+		$sql.= ", fk_vendor";
+
 		$sql.= ")";
 		$sql.= " VALUES (";
 		$sql.= "'(PROV)'";
@@ -354,6 +335,10 @@ class Facture extends CommonInvoice
 		$sql.= ", ".($this->situation_final?$this->situation_final:0);
 		$sql.= ", ".(int) $this->fk_incoterms;
         $sql.= ", '".$this->db->escape($this->location_incoterms)."'";
+        // Checkpoint: IMPLEM#002 adding vendor in sql
+		$sql.= ", ";
+		$sql.= $soc->array_options['options_vendedor']?$this->db->escape($soc->array_options['options_vendedor']):"null";
+		//////
 		$sql.=")";
 
 		dol_syslog(get_class($this)."::create", LOG_DEBUG);
@@ -977,6 +962,10 @@ class Facture extends CommonInvoice
 		$sql.= ', f.fk_mode_reglement, f.fk_cond_reglement, f.fk_projet, f.extraparams';
 		$sql.= ', f.situation_cycle_ref, f.situation_counter, f.situation_final';
 		$sql.= ', f.fk_account';
+
+		// Checkpoint: IMPLEM#002 get vendor
+		$sql.= ', f.fk_vendor';
+
 		$sql.= ', p.code as mode_reglement_code, p.libelle as mode_reglement_libelle';
 		$sql.= ', c.code as cond_reglement_code, c.libelle as cond_reglement_libelle, c.libelle_facture as cond_reglement_libelle_doc';
         $sql.= ', f.fk_incoterms, f.location_incoterms';
@@ -1043,6 +1032,10 @@ class Facture extends CommonInvoice
 				$this->situation_counter    = $obj->situation_counter;
 				$this->situation_final      = $obj->situation_final;
 				$this->extraparams			= (array) json_decode($obj->extraparams, true);
+
+				// Checkpoint: IMPLEM#002 assign vendor
+				$this->vendorid      = $obj->fk_vendor;
+
 
 				//Incoterms
 				$this->fk_incoterms = $obj->fk_incoterms;
