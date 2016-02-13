@@ -74,7 +74,7 @@ class Commande extends CommonOrder
 
 
     //Checkpoint: Variable para tomar el id del vendedor para el pedido
-    var $vendor;
+    var $vendorid;
 
 	/**
 	 * Status of the order. Check the following constants:
@@ -1493,6 +1493,10 @@ class Commande extends CommonOrder
         $sql.= ', c.fk_projet, c.remise_percent, c.remise, c.remise_absolue, c.source, c.facture as billed';
         $sql.= ', c.note_private, c.note_public, c.ref_client, c.ref_ext, c.ref_int, c.model_pdf, c.fk_delivery_address, c.extraparams';
         $sql.= ', c.fk_incoterms, c.location_incoterms';
+
+        // Checkpoint: IMPLEM#001 including vendor in sql
+        $sql.= ', c.fk_vendor';
+
         $sql.= ", i.libelle as libelle_incoterms";
         $sql.= ', p.code as mode_reglement_code, p.libelle as mode_reglement_libelle';
         $sql.= ', cr.code as cond_reglement_code, cr.libelle as cond_reglement_libelle, cr.libelle_facture as cond_reglement_libelle_doc';
@@ -1558,6 +1562,9 @@ class Commande extends CommonOrder
                 $this->date_livraison		= $this->db->jdate($obj->date_livraison);
                 $this->shipping_method_id   = ($obj->fk_shipping_method>0)?$obj->fk_shipping_method:null;
                 $this->fk_delivery_address	= $obj->fk_delivery_address;
+
+                // Checkpoint: IMPLEM#001 including vendor into commande
+                $this->vendorid             = $obj->fk_vendor;
 
 				//Incoterms
 				$this->fk_incoterms = $obj->fk_incoterms;

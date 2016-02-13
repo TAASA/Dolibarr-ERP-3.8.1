@@ -1,39 +1,11 @@
 <?php
-/* Copyright (C) 2003-2006	Rodolphe Quiedeville	<rodolphe@quiedeville.org>
- * Copyright (C) 2004-2015	Laurent Destailleur		<eldy@users.sourceforge.net>
- * Copyright (C) 2005		Marc Barilley / Ocebo	<marc@ocebo.com>
- * Copyright (C) 2005-2015	Regis Houssin			<regis.houssin@capnetworks.com>
- * Copyright (C) 2006		Andre Cianfarani		<acianfa@free.fr>
- * Copyright (C) 2010-2013	Juanjo Menent			<jmenent@2byte.es>
- * Copyright (C) 2011		Philippe Grand			<philippe.grand@atoo-net.com>
- * Copyright (C) 2012-2013	Christophe Battarel		<christophe.battarel@altairis.fr>
- * Copyright (C) 2012		Marcos García			<marcosgdf@gmail.com>
- * Copyright (C) 2012       Cedric Salvador      <csalvador@gpcsolutions.fr>
- * Copyright (C) 2013		Florian Henry			<florian.henry@open-concept.pro>
- * Copyright (C) 2014       Ferran Marcet			<fmarcet@2byte.es>
- * Copyright (C) 2015       Jean-François Ferry		<jfefe@aternatik.fr>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 
-/**
- * \file htdocs/commande/card.php
- * \ingroup commande
- * \brief Page to show customer order
- */
+//////////////////////////////////////////////////////////
+//					Includes Section 					//
+//////////////////////////////////////////////////////////
 
 require '../main.inc.php';
+
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formorder.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/commande/modules_commande.php';
@@ -42,13 +14,17 @@ require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/order.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
-if (! empty($conf->propal->enabled))
-	require DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
+if (! empty($conf->propal->enabled)) require DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
 if (! empty($conf->projet->enabled)) {
 	require DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 	require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 }
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+
+// Checkpoint: IMPLEM#001 including vendor
+require_once DOL_DOCUMENT_ROOT . '/custom/vendors/class/vendors.class.php';
+
+/////////////////////////////////////////////////////////
 
 $langs->load('orders');
 $langs->load('sendings');
@@ -96,8 +72,6 @@ $hookmanager->initHooks(array('ordercard','globalcard'));
 $permissionnote = $user->rights->commande->creer; 		// Used by the include of actions_setnotes.inc.php
 $permissiondellink = $user->rights->commande->creer; 	// Used by the include of actions_dellink.inc.php
 $permissionedit = $user->rights->commande->creer; 		// Used by the include of actions_lineupdown.inc.php
-
-
 
 /*
  * Actions
@@ -1598,6 +1572,11 @@ if ($action == 'create' && $user->rights->commande->creer)
 		$author = new User($db);
 		$author->fetch($object->user_author_id);
 
+		// Checkpoint: IMPLEM#001 fetch vendor
+		$vendor = new Vendors($db);
+		$vendor->fetch($object->vendorid);
+		///// 
+
 		$res = $object->fetch_optionals($object->id, $extralabels);
 
 		$head = commande_prepare_head($object);
@@ -1824,6 +1803,12 @@ if ($action == 'create' && $user->rights->commande->creer)
 			$filterabsolutediscount = "fk_facture_source IS NULL OR (fk_facture_source IS NOT NULL AND description='(DEPOSIT)')";
 			$filtercreditnote = "fk_facture_source IS NOT NULL AND description <> '(DEPOSIT)'";
 		}
+
+		// Checkpoint: IMPLEM#001 print vendor
+		// Vendor
+		print '<tr><td>' . $langs->trans('Vendedor') . '</td>';
+		print '<td colspan="3">' . $vendor->getFullName() . '</td>';
+		print '</tr>';
 
 		// Relative and absolute discounts
 		$addrelativediscount = '<a href="' . DOL_URL_ROOT . '/comm/remise.php?id=' . $soc->id . '&backtopage=' . urlencode($_SERVER["PHP_SELF"]) . '?facid=' . $object->id . '">' . $langs->trans("EditRelativeDiscounts") . '</a>';
